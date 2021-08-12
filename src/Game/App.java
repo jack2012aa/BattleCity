@@ -25,6 +25,7 @@ public class App {
 		//Choose the level player want to play
 		Level level = new Level1();
 		frame.add(level.pane);
+		frame.addKeyListener(level.keyAdapter);
 		frame.setVisible(true);
 		
 		frame.addWindowListener(new WindowListener() {

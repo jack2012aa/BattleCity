@@ -3,20 +3,20 @@ package Block;
 import java.awt.event.KeyEvent;
 
 public class Tank extends Block{
-	
-	
+
+	private static final long serialVersionUID = 1L;
 	public boolean bL=false, bU=false, bR=false, bD=false;  // control of the dir
 	public enum Direction {
-		W  (-1, 0, "static/picture/tankWest.png"),
-		NW (-1,-1, "static/picture/tankNorthWest.png"), 
-		N  ( 0,-1, "static/picture/tankNorth.png"), 
-		NE ( 1,-1, "static/picture/tankNorthEast.png"), 
-		E  ( 1, 0, "static/picture/tankEast.png"), 
-		SE ( 1, 1, "static/picture/tankSouthEast.png"), 
-		S  ( 0, 1, "static/picture/tankSouth.png"), 
-		SW (-1, 1, "static/picture/tankSouthWest.png"), 
+		W  (-2, 0, "static/picture/tankWest.png"),
+		NW (-2,-2, "static/picture/tankNorthWest.png"), 
+		N  ( 0,-2, "static/picture/tankNorth.png"), 
+		NE ( 2,-2, "static/picture/tankNorthEast.png"), 
+		E  ( 2, 0, "static/picture/tankEast.png"), 
+		SE ( 2, 2, "static/picture/tankSouthEast.png"), 
+		S  ( 0, 2, "static/picture/tankSouth.png"), 
+		SW (-2, 2, "static/picture/tankSouthWest.png"), 
 		STOP(0, 0);
-		
+
 		private int xSpeed;
 		private int ySpeed;
 		private String pic;
@@ -41,18 +41,24 @@ public class Tank extends Block{
 	}
 	public Direction dir = Direction.STOP;
 	
-	public Tank(int x, int y){
+	public Tank() {
 		
 		this.setBlood(10);
 		this.setBreakable(true);
-		this.setX(x);
-		this.setY(y);
-		this.setSize(25);
-		this.setPicture("static/picture/tankNorth.png"); //initial direction is north
+		picturePath = "static/picture/tankNorth.png";
+		this.setPicture(picturePath); //initial direction is north
 		
 	}
 	
-	
+	public Tank(int x, int y){
+
+		this();
+		this.setX(x);
+		this.setY(y);
+
+	}
+
+
 	public void KeyPressed(KeyEvent e) {
 		int key = e.getKeyCode(); // store the keyboard in integer
 		switch (key) {
@@ -123,13 +129,25 @@ public class Tank extends Block{
 		else if(!bL&&!bU&&!bR&&bD) dir=Direction.S;
 		else if(bL&&!bU&&!bR&&bD) dir=Direction.SW;
 		else if(!bL&&!bU&&!bR&&!bD) dir=Direction.STOP;
-		}
+	}
 
 
 	@Override
 	public Block clone() {
-		return null;
+		
+		Tank tank = new Tank();
+		tank.setX(this.getX());
+		tank.setY(this.getY());
+		return tank;
+	
+	}
+	
+	@Override
+	public String toString() {
+		
+		return "Tank";
+		
 	}
 
-	
+
 }

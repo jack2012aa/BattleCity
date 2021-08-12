@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import Background.Background;
 import Block.Block;
+import Block.Tank;
 
 /**
  * Record the array of backgrounds, array list of blocks and position of tanks. Can edit by editor and read by game application.
@@ -18,7 +19,8 @@ public class Map implements Serializable{
 	private int xSize;  //Size in pixels on X coordinate.
 	private int ySize;  //Size in pixels on Y coordinate.
 	private int pictureSize = 50;  //Size of picture in pixels.
-
+	private Tank tank = null;  //Player's tank.
+	
 	/**
 	 * Generate a map in size xSize * ySize pixels
 	 * @param xSize How many pixels on x coordinate
@@ -74,7 +76,7 @@ public class Map implements Serializable{
 		
 		for (int i = 0; i < blocks.size(); i++) {
 			Block block = blocks.get(i);
-			if (block.getX() == x && block.getY() == y) {
+			if (x >= block.getX() && x <= block.getX() + pictureSize && y >= block.getY() && y <= block.getY() + pictureSize) {
 				return block;
 			}
 		}
@@ -102,7 +104,7 @@ public class Map implements Serializable{
 		for (int i = 0; i < blocks.size(); i++) {
 			
 			Block block = blocks.get(i);
-			if (block.getX() == x && block.getY() == y) {
+			if (x >= block.getX() && x <= block.getX() + pictureSize && y >= block.getY() && y <= block.getY() + pictureSize) {
 				return true;
 			}
 			
@@ -131,6 +133,74 @@ public class Map implements Serializable{
 	
 	public int getPictureSize() {
 		return pictureSize;
+	}
+	
+	public void setTank(Tank tank) {
+		this.tank = tank;
+	}
+	
+	public Tank getTank() {
+		return this.tank;
+	}
+	
+	/**
+	 * Move player's tank and change picture depend on key press. Nothing will happen if no key is pressed or the tank is trying to walk into an unwalkable place.
+	 */
+	public void tankMove() {
+		if(!(!tank.bL&&!tank.bU&&!tank.bR&&!tank.bD)) {
+			tank.setPicture(tank.dir.getPic());
+		}
+		int newX = tank.getX() + tank.dir.getxSpeed();
+		int newY = tank.getY() + tank.dir.getySpeed();
+		
+		if (checkBlockCollision(newX, tank.getY(), 48) == null && isWalkable(newX, tank.getY(), 48)) {
+			tank.setX(newX);
+		}
+		
+		if (checkBlockCollision(tank.getX(), newY, 48) == null && isWalkable(tank.getX(), newY, 48)) {
+			tank.setY(newY);
+		}
+		
+	}
+	
+	private Block checkBlockCollision(int x, int y, int pictureSize) {
+		
+		if (hasBlock(x, y)) {
+			return getBlock(x, y);
+		} else if (hasBlock(x, y + pictureSize)) {
+			return getBlock(x, y + pictureSize);
+		} else if (hasBlock(x + pictureSize, y)) {
+			return getBlock(x + pictureSize, y);
+		} else {
+			return getBlock(x + pictureSize, y + pictureSize);
+		}
+
+		
+	}
+	
+	private boolean checkBundaryCollision(int x , int y, int pictureSize) {
+		
+		if ( x * y <= 0 || x + pictureSize > xSize || y + pictureSize > ySize) {
+			return true;
+		} 
+		return false;
+	}
+	
+	private boolean isWalkable(int x, int y, int pictureSize) {
+		
+		System.out.printf("x1: %d, y1: %d x2:%d, y2:%d\n", x, y, x + pictureSize, y + pictureSize);
+		
+		if ( x * y <= 0 || x + this.pictureSize >= xSize || y + this.pictureSize >= ySize) {
+			return false;
+		} 
+		
+		Background northWestBackground = backgrounds[y / this.pictureSize][x / this.pictureSize];
+		Background northEastBackground = backgrounds[y / this.pictureSize][(x + pictureSize) / this.pictureSize];
+		Background southEastBackground = backgrounds[(y + pictureSize) / this.pictureSize][(x + pictureSize) / this.pictureSize];
+		Background southWestBackground = backgrounds[(y + pictureSize) / this.pictureSize][x / this.pictureSize];
+		
+		return northWestBackground.isWalkable() && northEastBackground.isWalkable() && southEastBackground.isWalkable() && southWestBackground.isWalkable();
+		
 	}
 	
 }
